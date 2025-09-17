@@ -35,6 +35,7 @@ opentelemetry-instrumentation-fastapi = "^0.50b0"
 opentelemetry-instrumentation-logging = "^0.50b0"
 opentelemetry-instrumentation-redis = "^0.50b0"
 opentelemetry-instrumentation-sqlalchemy = "^0.50b0"
+fief-client = {extras = ["fastapi"], version = "^0.20.0"}
 
 
 [tool.poetry.group.dev.dependencies]

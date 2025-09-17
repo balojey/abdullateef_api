@@ -35,6 +35,11 @@ class Settings(BaseSettings):
     # Enable uvicorn reloading
     reload: bool = False
 
+    # Fief
+    fief_client_id: str = ""
+    fief_client_secret: str = ""
+    fief_base_url: str = ""
+
     # Current environment
     environment: str = "dev"
 
