@@ -1,0 +1,70 @@
+services:
+  api: &main_app
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: abdullateef_api:${ABDULLATEEF_API_VERSION:-latest}
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      ABDULLATEEF_API_HOST: 0.0.0.0
+      ABDULLATEEF_API_DB_HOST: abdullateef_api-db
+      ABDULLATEEF_API_DB_PORT: 5432
+      ABDULLATEEF_API_DB_USER: abdullateef_api
+      ABDULLATEEF_API_DB_PASS: abdullateef_api
+      ABDULLATEEF_API_DB_BASE: abdullateef_api
+      ABDULLATEEF_API_REDIS_HOST: abdullateef_api-redis
+
+  db:
+    image: postgres:16.3-bullseye
+    hostname: abdullateef_api-db
+    environment:
+      POSTGRES_PASSWORD: "abdullateef_api"
+      POSTGRES_USER: "abdullateef_api"
+      POSTGRES_DB: "abdullateef_api"
+    volumes:
+      - abdullateef_api-db-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: pg_isready -U abdullateef_api
+      interval: 2s
+      timeout: 3s
+      retries: 40
+
+  migrator:
+    image: abdullateef_api:${ABDULLATEEF_API_VERSION:-latest}
+    restart: "no"
+    command: alembic upgrade head
+    environment:
+      ABDULLATEEF_API_DB_HOST: abdullateef_api-db
+      ABDULLATEEF_API_DB_PORT: 5432
+      ABDULLATEEF_API_DB_USER: abdullateef_api
+      ABDULLATEEF_API_DB_PASS: abdullateef_api
+      ABDULLATEEF_API_DB_BASE: abdullateef_api
+    depends_on:
+      db:
+        condition: service_healthy
+
+  redis:
+    image: bitnami/redis:6.2.5
+    hostname: "abdullateef_api-redis"
+    restart: always
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 50
+
+
+
+volumes:
+  abdullateef_api-db-data:
+    name: abdullateef_api-db-data
