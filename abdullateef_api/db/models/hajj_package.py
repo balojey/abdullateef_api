@@ -1,4 +1,3 @@
-# abdullateef_api/db/models/hajj_package.py
 import uuid
 from datetime import datetime
 from typing import List, Optional
