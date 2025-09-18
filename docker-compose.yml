@@ -10,8 +10,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      redis:
-        condition: service_healthy
+      # redis:
+      #   condition: service_healthy
     environment:
       ABDULLATEEF_API_HOST: 0.0.0.0
       ABDULLATEEF_API_DB_HOST: abdullateef_api-db
@@ -51,17 +51,17 @@ services:
       db:
         condition: service_healthy
 
-  redis:
-    image: bitnami/redis:6.2.5
-    hostname: "abdullateef_api-redis"
-    restart: always
-    environment:
-      ALLOW_EMPTY_PASSWORD: "yes"
-    healthcheck:
-      test: redis-cli ping
-      interval: 1s
-      timeout: 3s
-      retries: 50
+  # redis:
+  #   image: bitnami/redis:6.2.5
+  #   hostname: "abdullateef_api-redis"
+  #   restart: always
+  #   environment:
+  #     ALLOW_EMPTY_PASSWORD: "yes"
+  #   healthcheck:
+  #     test: redis-cli ping
+  #     interval: 1s
+  #     timeout: 3s
+  #     retries: 50
 
 
 

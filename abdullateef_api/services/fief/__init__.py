@@ -1,22 +1,20 @@
-import os
-
 from fastapi.security import OAuth2AuthorizationCodeBearer
 from fief_client import FiefAsync
 from fief_client.integrations.fastapi import FiefAuth
 
 from abdullateef_api.settings import settings
 
-fief = FiefAsync(  
+fief = FiefAsync(
     settings.fief_base_url,
     settings.fief_client_id,
     settings.fief_client_secret,
 )
 
-scheme = OAuth2AuthorizationCodeBearer(  
-    f"{settings.fief_base_url}/authorize",  
-    f"{settings.fief_base_url}/api/token",  
+scheme = OAuth2AuthorizationCodeBearer(
+    f"{settings.fief_base_url}/authorize",
+    f"{settings.fief_base_url}/api/token",
     scopes={"openid": "openid"},
-    auto_error=False,  
+    auto_error=False,
 )
 
-auth = FiefAuth(fief, scheme)  
+auth = FiefAuth(fief, scheme)

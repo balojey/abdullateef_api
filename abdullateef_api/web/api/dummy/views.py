@@ -3,21 +3,11 @@ from typing import List
 from fastapi import APIRouter
 from fastapi.param_functions import Depends
 
-from fief_client import FiefAccessTokenInfo
-
 from abdullateef_api.db.dao.dummy_dao import DummyDAO
 from abdullateef_api.db.models.dummy_model import DummyModel
 from abdullateef_api.web.api.dummy.schema import DummyModelDTO, DummyModelInputDTO
-from abdullateef_api.services.fief import auth
 
 router = APIRouter()
-
-
-@router.get("/user")
-async def get_user(
-    access_token_info: FiefAccessTokenInfo = Depends(auth.authenticated())
-):
-    return access_token_info
 
 
 @router.get("/", response_model=List[DummyModelDTO])
