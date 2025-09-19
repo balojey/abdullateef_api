@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from fastapi import Depends
-from sqlalchemy import select, update, delete
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from abdullateef_api.db.dependencies import get_db_session
@@ -46,7 +46,9 @@ class HajjPackageDAO:
     # -------------------------------
     # READ
     # -------------------------------
-    async def get_all_packages(self, limit: int = 100, offset: int = 0) -> List[HajjPackage]:
+    async def get_all_packages(
+        self, limit: int = 100, offset: int = 0,
+    ) -> List[HajjPackage]:
         """
         Get all Hajj Packages with pagination.
         """
@@ -91,7 +93,7 @@ class HajjPackageDAO:
             update(HajjPackage)
             .where(HajjPackage.id == package_id)
             .values(**kwargs)
-            .execution_options(synchronize_session="fetch")
+            .execution_options(synchronize_session="fetch"),
         )
         result = await self.session.execute(
             select(HajjPackage).where(HajjPackage.id == package_id),
@@ -105,6 +107,8 @@ class HajjPackageDAO:
         """
         Delete a Hajj Package by ID.
         """
-        await self.session.execute(
+        result = await self.session.execute(
             delete(HajjPackage).where(HajjPackage.id == package_id),
         )
+        await self.session.commit()
+        return result.rowcount > 0

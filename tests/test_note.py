@@ -1,10 +1,11 @@
 import uuid
+
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from abdullateef_api.db.dao.note_dao import NoteDAO
 from abdullateef_api.db.dao.client_dao import ClientDAO
-from abdullateef_api.db.enums import GenderEnum, CountryEnum
+from abdullateef_api.db.dao.note_dao import NoteDAO
+from abdullateef_api.db.enums import CountryEnum, GenderEnum
 
 
 @pytest.mark.anyio
@@ -53,8 +54,12 @@ class TestNoteDAO:
         dao = NoteDAO(dbsession)
         creator_id = uuid.uuid4()
 
-        await dao.create_note(client_id=client.id, content="Creator note", created_by=creator_id)
-        await dao.create_note(client_id=client.id, content="Another note", created_by=creator_id)
+        await dao.create_note(
+            client_id=client.id, content="Creator note", created_by=creator_id,
+        )
+        await dao.create_note(
+            client_id=client.id, content="Another note", created_by=creator_id,
+        )
 
         notes = await dao.get_by_created_by(creator_id)
 

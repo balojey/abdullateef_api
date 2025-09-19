@@ -1,11 +1,11 @@
 import uuid
 from typing import List, Optional
 
-from sqlalchemy import select, update, delete
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from abdullateef_api.db.models.payment_transaction import PaymentTransaction
 from abdullateef_api.db.enums import PaymentTypeEnum
+from abdullateef_api.db.models.payment_transaction import PaymentTransaction
 
 
 class PaymentTransactionDAO:
@@ -36,24 +36,34 @@ class PaymentTransactionDAO:
     # ------------------------------
     # READ
     # ------------------------------
-    async def get_by_id(self, transaction_id: uuid.UUID) -> Optional[PaymentTransaction]:
+    async def get_by_id(
+        self, transaction_id: uuid.UUID,
+    ) -> Optional[PaymentTransaction]:
         """Fetch a payment transaction by ID."""
         result = await self.session.execute(
-            select(PaymentTransaction).where(PaymentTransaction.id == transaction_id)
+            select(PaymentTransaction).where(PaymentTransaction.id == transaction_id),
         )
         return result.scalar_one_or_none()
 
-    async def get_by_booking_id(self, booking_id: uuid.UUID) -> List[PaymentTransaction]:
+    async def get_by_booking_id(
+        self, booking_id: uuid.UUID,
+    ) -> List[PaymentTransaction]:
         """Fetch all payment transactions for a given booking."""
         result = await self.session.execute(
-            select(PaymentTransaction).where(PaymentTransaction.booking_id == booking_id)
+            select(PaymentTransaction).where(
+                PaymentTransaction.booking_id == booking_id,
+            ),
         )
         return list(result.scalars().all())
 
-    async def get_by_payment_type(self, payment_type: PaymentTypeEnum) -> List[PaymentTransaction]:
+    async def get_by_payment_type(
+        self, payment_type: PaymentTypeEnum,
+    ) -> List[PaymentTransaction]:
         """Fetch all transactions of a given payment type."""
         result = await self.session.execute(
-            select(PaymentTransaction).where(PaymentTransaction.payment_type == payment_type)
+            select(PaymentTransaction).where(
+                PaymentTransaction.payment_type == payment_type,
+            ),
         )
         return list(result.scalars().all())
 
@@ -74,7 +84,7 @@ class PaymentTransactionDAO:
         await self.session.execute(
             update(PaymentTransaction)
             .where(PaymentTransaction.id == transaction_id)
-            .values(amount=new_amount)
+            .values(amount=new_amount),
         )
         await self.session.flush()
         return await self.get_by_id(transaction_id)
@@ -88,7 +98,7 @@ class PaymentTransactionDAO:
         await self.session.execute(
             update(PaymentTransaction)
             .where(PaymentTransaction.id == transaction_id)
-            .values(payment_type=new_type)
+            .values(payment_type=new_type),
         )
         await self.session.flush()
         return await self.get_by_id(transaction_id)
@@ -99,6 +109,6 @@ class PaymentTransactionDAO:
     async def delete_transaction(self, transaction_id: uuid.UUID) -> None:
         """Delete a transaction by ID."""
         await self.session.execute(
-            delete(PaymentTransaction).where(PaymentTransaction.id == transaction_id)
+            delete(PaymentTransaction).where(PaymentTransaction.id == transaction_id),
         )
         await self.session.flush()

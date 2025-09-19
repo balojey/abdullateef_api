@@ -1,11 +1,12 @@
 import uuid
+
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from abdullateef_api.db.dao.agent_dao import AgentDAO
 from abdullateef_api.db.models.booking import Booking
-from abdullateef_api.db.models.commission import Commission
 from abdullateef_api.db.models.client import Client
+from abdullateef_api.db.models.commission import Commission
 from abdullateef_api.db.models.hajj_package import HajjPackage
 
 
@@ -140,10 +141,37 @@ async def test_relationship_helpers(dbsession: AsyncSession) -> None:
     agent = await dao.create_agent(first_name="Rel", last_name="Test")
 
     # manually insert related records
-    hajj_package = HajjPackage(id=uuid.uuid4(), year=2028, local_price=10000000, diaspora_price=9000000, registration_fee=20000, commission_amount=700000)
-    client = Client(id=uuid.uuid4(), first_name="Ref", last_name="Client", referee_id=agent.id, passport_number="P123456", location="NG", sex="MALE", phone_number="0383932028393")
-    booking = Booking(id=uuid.uuid4(), agent_id=agent.id, client_id=client.id, package_id=hajj_package.id, status="REGISTERED")
-    commission = Commission(id=uuid.uuid4(), agent_id=agent.id, booking_id=booking.id, commission_amount=hajj_package.commission_amount)
+    hajj_package = HajjPackage(
+        id=uuid.uuid4(),
+        year=2028,
+        local_price=10000000,
+        diaspora_price=9000000,
+        registration_fee=20000,
+        commission_amount=700000,
+    )
+    client = Client(
+        id=uuid.uuid4(),
+        first_name="Ref",
+        last_name="Client",
+        referee_id=agent.id,
+        passport_number="P123456",
+        location="NG",
+        sex="MALE",
+        phone_number="0383932028393",
+    )
+    booking = Booking(
+        id=uuid.uuid4(),
+        agent_id=agent.id,
+        client_id=client.id,
+        package_id=hajj_package.id,
+        status="REGISTERED",
+    )
+    commission = Commission(
+        id=uuid.uuid4(),
+        agent_id=agent.id,
+        booking_id=booking.id,
+        commission_amount=hajj_package.commission_amount,
+    )
 
     dbsession.add_all([hajj_package, booking, commission, client])
     await dbsession.flush()

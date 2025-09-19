@@ -1,12 +1,12 @@
 import uuid
 from typing import List, Optional
 
-from sqlalchemy import select, or_
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from abdullateef_api.db.models.client import Client
-from abdullateef_api.db.models.agent import Agent
 from abdullateef_api.db.enums import CountryEnum, GenderEnum
+from abdullateef_api.db.models.agent import Agent
+from abdullateef_api.db.models.client import Client
 
 
 class ClientDAO:
@@ -47,7 +47,7 @@ class ClientDAO:
     async def get_by_id(self, client_id: uuid.UUID) -> Optional[Client]:
         """Fetch a client by ID."""
         result = await self.session.execute(
-            select(Client).where(Client.id == client_id)
+            select(Client).where(Client.id == client_id),
         )
         return result.scalars().first()
 
@@ -64,8 +64,8 @@ class ClientDAO:
                     Client.first_name.ilike(f"%{name}%"),
                     Client.last_name.ilike(f"%{name}%"),
                     Client.other_name.ilike(f"%{name}%"),
-                )
-            )
+                ),
+            ),
         )
         return list(result.scalars().all())
 
@@ -100,20 +100,18 @@ class ClientDAO:
     async def get_by_passport(self, passport_number: str) -> Optional[Client]:
         """Fetch a client by passport number."""
         result = await self.session.execute(
-            select(Client).where(Client.passport_number == passport_number)
+            select(Client).where(Client.passport_number == passport_number),
         )
         return result.scalars().first()
 
     async def get_by_phone(self, phone_number: str) -> Optional[Client]:
         """Fetch a client by phone number."""
         result = await self.session.execute(
-            select(Client).where(Client.phone_number == phone_number)
+            select(Client).where(Client.phone_number == phone_number),
         )
         return result.scalars().first()
 
-    async def get_by_referee(
-        self, referee: uuid.UUID | str
-    ) -> List[Client]:
+    async def get_by_referee(self, referee: uuid.UUID | str) -> List[Client]:
         """
         Fetch clients referred by a specific agent.
         Accepts either referee_id (UUID) or referee_code (string).
@@ -121,14 +119,12 @@ class ClientDAO:
         if isinstance(referee, uuid.UUID):
             # Search by referee_id
             result = await self.session.execute(
-                select(Client).where(Client.referee_id == referee)
+                select(Client).where(Client.referee_id == referee),
             )
         else:
             # Search by referee_code via join with Agent
             result = await self.session.execute(
-                select(Client)
-                .join(Client.referee)
-                .where(Agent.agent_code == referee)
+                select(Client).join(Client.referee).where(Agent.agent_code == referee),
             )
 
         return list(result.scalars().all())
@@ -136,6 +132,6 @@ class ClientDAO:
     async def get_by_location(self, location: CountryEnum) -> List[Client]:
         """Fetch clients by current location."""
         result = await self.session.execute(
-            select(Client).where(Client.location == location)
+            select(Client).where(Client.location == location),
         )
         return list(result.scalars().all())

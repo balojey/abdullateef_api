@@ -1,14 +1,11 @@
-import uuid
 from datetime import date
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from abdullateef_api.db.dao.client_dao import ClientDAO
 from abdullateef_api.db.dao.agent_dao import AgentDAO
+from abdullateef_api.db.dao.client_dao import ClientDAO
 from abdullateef_api.db.enums import CountryEnum, GenderEnum
-from abdullateef_api.db.models.client import Client
-from abdullateef_api.db.models.agent import Agent
 
 
 @pytest.mark.anyio

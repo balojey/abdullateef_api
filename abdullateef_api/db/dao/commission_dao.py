@@ -2,7 +2,7 @@ import uuid
 from typing import List, Optional
 
 from fastapi import Depends
-from sqlalchemy import select, update, delete
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from abdullateef_api.db.dependencies import get_db_session

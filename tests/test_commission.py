@@ -1,17 +1,18 @@
 import uuid
+
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from abdullateef_api.db.dao.commission_dao import CommissionDAO
 from abdullateef_api.db.enums import CommissionStatusEnum
-from abdullateef_api.db.models.commission import Commission
 from abdullateef_api.db.models.agent import Agent
 from abdullateef_api.db.models.booking import Booking
 from abdullateef_api.db.models.client import Client
+from abdullateef_api.db.models.commission import Commission
 from abdullateef_api.db.models.hajj_package import HajjPackage
 
-
 # ---------- Fixtures & Factories ----------
+
 
 @pytest.fixture
 def agent_factory():
@@ -22,6 +23,7 @@ def agent_factory():
             last_name="Hassan",
             agent_code=agent_code,
         )
+
     return _create_agent
 
 
@@ -36,6 +38,7 @@ def package_factory():
             registration_fee=20000,
             commission_amount=commission_amount,
         )
+
     return _create_package
 
 
@@ -52,6 +55,7 @@ def client_factory():
             sex="MALE",
             phone_number="0383932028393",
         )
+
     return _create_client
 
 
@@ -63,22 +67,27 @@ def booking_factory():
             client_id=client_id,
             package_id=package_id,
         )
+
     return _create_booking
 
 
 @pytest.fixture
 def commission_factory():
-    def _create_commission(agent_id, booking_id, amount, status=CommissionStatusEnum.PENDING):
+    def _create_commission(
+        agent_id, booking_id, amount, status=CommissionStatusEnum.PENDING,
+    ):
         return Commission(
             agent_id=agent_id,
             booking_id=booking_id,
             commission_amount=amount,
             status=status,
         )
+
     return _create_commission
 
 
 # ---------- Tests ----------
+
 
 @pytest.mark.anyio
 async def test_create_and_get_by_id(
@@ -166,10 +175,27 @@ async def test_get_by_status_and_list_all(
     package2 = package_factory(2029, 700000)
     client2 = client_factory(agent2.id, "P123457")
     booking2 = booking_factory(client2.id, package2.id)
-    commission2 = commission_factory(agent2.id, booking2.id, package2.commission_amount, status=CommissionStatusEnum.PAID)
+    commission2 = commission_factory(
+        agent2.id,
+        booking2.id,
+        package2.commission_amount,
+        status=CommissionStatusEnum.PAID,
+    )
 
-    dbsession.add_all([agent1, package1, client1, booking1, commission1,
-                       agent2, package2, client2, booking2, commission2])
+    dbsession.add_all(
+        [
+            agent1,
+            package1,
+            client1,
+            booking1,
+            commission1,
+            agent2,
+            package2,
+            client2,
+            booking2,
+            commission2,
+        ],
+    )
     await dbsession.commit()
 
     pending = await dao.get_by_status(CommissionStatusEnum.PENDING)

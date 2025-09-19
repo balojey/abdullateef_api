@@ -1,14 +1,13 @@
-import uuid
 from datetime import date
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from abdullateef_api.db.dao.payment_transaction_dao import PaymentTransactionDAO
+from abdullateef_api.db.dao.agent_dao import AgentDAO
 from abdullateef_api.db.dao.booking_dao import BookingDAO
 from abdullateef_api.db.dao.client_dao import ClientDAO
-from abdullateef_api.db.dao.agent_dao import AgentDAO
 from abdullateef_api.db.dao.hajj_package_dao import HajjPackageDAO
+from abdullateef_api.db.dao.payment_transaction_dao import PaymentTransactionDAO
 from abdullateef_api.db.enums import CountryEnum, GenderEnum, PaymentTypeEnum
 from abdullateef_api.db.models.payment_transaction import PaymentTransaction
 
@@ -55,7 +54,7 @@ class TestPaymentTransactionDAO:
             client_id=client.id,
             agent_id=agent.id,
             travelling_from=CountryEnum.UK,
-            package_id=hajj_package.id
+            package_id=hajj_package.id,
         )
 
         return booking
@@ -81,8 +80,12 @@ class TestPaymentTransactionDAO:
         booking = await self._create_dependencies(dbsession)
         dao = PaymentTransactionDAO(dbsession)
 
-        tx1 = await dao.create_payment_transaction(booking.id, 20000, PaymentTypeEnum.REGISTRATION)
-        tx2 = await dao.create_payment_transaction(booking.id, 30000, PaymentTypeEnum.INSTALLMENT)
+        tx1 = await dao.create_payment_transaction(
+            booking.id, 20000, PaymentTypeEnum.REGISTRATION,
+        )
+        tx2 = await dao.create_payment_transaction(
+            booking.id, 30000, PaymentTypeEnum.INSTALLMENT,
+        )
 
         transactions = await dao.get_by_booking_id(booking.id)
         assert len(transactions) == 2
@@ -93,20 +96,30 @@ class TestPaymentTransactionDAO:
         booking = await self._create_dependencies(dbsession)
         dao = PaymentTransactionDAO(dbsession)
 
-        await dao.create_payment_transaction(booking.id, 40000, PaymentTypeEnum.REGISTRATION)
-        await dao.create_payment_transaction(booking.id, 25000, PaymentTypeEnum.INSTALLMENT)
+        await dao.create_payment_transaction(
+            booking.id, 40000, PaymentTypeEnum.REGISTRATION,
+        )
+        await dao.create_payment_transaction(
+            booking.id, 25000, PaymentTypeEnum.INSTALLMENT,
+        )
 
         card_payments = await dao.get_by_payment_type(PaymentTypeEnum.REGISTRATION)
         assert len(card_payments) >= 1
-        assert all(tx.payment_type == PaymentTypeEnum.REGISTRATION for tx in card_payments)
+        assert all(
+            tx.payment_type == PaymentTypeEnum.REGISTRATION for tx in card_payments
+        )
 
     async def test_list_all(self, dbsession: AsyncSession):
         """Test fetching all transactions."""
         booking = await self._create_dependencies(dbsession)
         dao = PaymentTransactionDAO(dbsession)
 
-        await dao.create_payment_transaction(booking.id, 10000, PaymentTypeEnum.INSTALLMENT)
-        await dao.create_payment_transaction(booking.id, 15000, PaymentTypeEnum.REGISTRATION)
+        await dao.create_payment_transaction(
+            booking.id, 10000, PaymentTypeEnum.INSTALLMENT,
+        )
+        await dao.create_payment_transaction(
+            booking.id, 15000, PaymentTypeEnum.REGISTRATION,
+        )
 
         all_tx = await dao.list_all()
         assert len(all_tx) >= 2
@@ -117,7 +130,9 @@ class TestPaymentTransactionDAO:
         booking = await self._create_dependencies(dbsession)
         dao = PaymentTransactionDAO(dbsession)
 
-        tx = await dao.create_payment_transaction(booking.id, 7000, PaymentTypeEnum.INSTALLMENT)
+        tx = await dao.create_payment_transaction(
+            booking.id, 7000, PaymentTypeEnum.INSTALLMENT,
+        )
         updated = await dao.update_transaction_amount(tx.id, 9000)
 
         assert updated is not None
@@ -128,7 +143,9 @@ class TestPaymentTransactionDAO:
         booking = await self._create_dependencies(dbsession)
         dao = PaymentTransactionDAO(dbsession)
 
-        tx = await dao.create_payment_transaction(booking.id, 12000, PaymentTypeEnum.INSTALLMENT)
+        tx = await dao.create_payment_transaction(
+            booking.id, 12000, PaymentTypeEnum.INSTALLMENT,
+        )
         updated = await dao.update_payment_type(tx.id, PaymentTypeEnum.REGISTRATION)
 
         assert updated is not None
@@ -139,7 +156,9 @@ class TestPaymentTransactionDAO:
         booking = await self._create_dependencies(dbsession)
         dao = PaymentTransactionDAO(dbsession)
 
-        tx = await dao.create_payment_transaction(booking.id, 15000, PaymentTypeEnum.INSTALLMENT)
+        tx = await dao.create_payment_transaction(
+            booking.id, 15000, PaymentTypeEnum.INSTALLMENT,
+        )
         await dao.delete_transaction(tx.id)
 
         fetched = await dao.get_by_id(tx.id)

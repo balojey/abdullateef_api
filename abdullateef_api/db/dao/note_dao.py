@@ -1,7 +1,7 @@
 import uuid
 from typing import List, Optional
 
-from sqlalchemy import select, update, delete
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from abdullateef_api.db.models.note import Note
@@ -28,22 +28,20 @@ class NoteDAO:
 
     async def get_by_id(self, note_id: uuid.UUID) -> Optional[Note]:
         """Get a note by ID."""
-        result = await self.session.execute(
-            select(Note).where(Note.id == note_id)
-        )
+        result = await self.session.execute(select(Note).where(Note.id == note_id))
         return result.scalar_one_or_none()
 
     async def get_by_client_id(self, client_id: uuid.UUID) -> List[Note]:
         """Get all notes for a given client."""
         result = await self.session.execute(
-            select(Note).where(Note.client_id == client_id)
+            select(Note).where(Note.client_id == client_id),
         )
         return result.scalars().all()
 
     async def get_by_created_by(self, created_by: uuid.UUID) -> List[Note]:
         """Get all notes created by a specific user."""
         result = await self.session.execute(
-            select(Note).where(Note.created_by == created_by)
+            select(Note).where(Note.created_by == created_by),
         )
         return result.scalars().all()
 
@@ -52,12 +50,12 @@ class NoteDAO:
         result = await self.session.execute(select(Note))
         return result.scalars().all()
 
-    async def update_content(self, note_id: uuid.UUID, new_content: str) -> Optional[Note]:
+    async def update_content(
+        self, note_id: uuid.UUID, new_content: str,
+    ) -> Optional[Note]:
         """Update the content of a note."""
         await self.session.execute(
-            update(Note)
-            .where(Note.id == note_id)
-            .values(content=new_content)
+            update(Note).where(Note.id == note_id).values(content=new_content),
         )
         await self.session.commit()
         return await self.get_by_id(note_id)

@@ -1,15 +1,15 @@
-import uuid
 import random
 import string
+import uuid
 from typing import List, Optional
 
-from sqlalchemy import select, update, delete
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from abdullateef_api.db.models.agent import Agent
 from abdullateef_api.db.models.booking import Booking
-from abdullateef_api.db.models.commission import Commission
 from abdullateef_api.db.models.client import Client
+from abdullateef_api.db.models.commission import Commission
 
 
 class AgentDAO:
@@ -72,20 +72,18 @@ class AgentDAO:
     # Get
     # ------------------------------
     async def get_by_id(self, agent_id: uuid.UUID) -> Optional[Agent]:
-        result = await self.session.execute(
-            select(Agent).where(Agent.id == agent_id)
-        )
+        result = await self.session.execute(select(Agent).where(Agent.id == agent_id))
         return result.scalar_one_or_none()
 
     async def get_by_code(self, agent_code: str) -> Optional[Agent]:
         result = await self.session.execute(
-            select(Agent).where(Agent.agent_code == agent_code)
+            select(Agent).where(Agent.agent_code == agent_code),
         )
         return result.scalar_one_or_none()
 
     async def get_by_phone(self, phone_number: str) -> Optional[Agent]:
         result = await self.session.execute(
-            select(Agent).where(Agent.phone_number == phone_number)
+            select(Agent).where(Agent.phone_number == phone_number),
         )
         return result.scalar_one_or_none()
 
@@ -103,9 +101,7 @@ class AgentDAO:
         return list(result.scalars().all())
 
     async def list_agents(self, limit: int = 50, offset: int = 0) -> List[Agent]:
-        result = await self.session.execute(
-            select(Agent).limit(limit).offset(offset)
-        )
+        result = await self.session.execute(select(Agent).limit(limit).offset(offset))
         return list(result.scalars().all())
 
     # ------------------------------
@@ -117,7 +113,7 @@ class AgentDAO:
         **kwargs,
     ) -> Optional[Agent]:
         await self.session.execute(
-            update(Agent).where(Agent.id == agent_id).values(**kwargs)
+            update(Agent).where(Agent.id == agent_id).values(**kwargs),
         )
         await self.session.flush()
         return await self.get_by_id(agent_id)
@@ -139,18 +135,18 @@ class AgentDAO:
     # ------------------------------
     async def get_bookings(self, agent_id: uuid.UUID) -> List[Booking]:
         result = await self.session.execute(
-            select(Booking).where(Booking.agent_id == agent_id)
+            select(Booking).where(Booking.agent_id == agent_id),
         )
         return list(result.scalars().all())
 
     async def get_commissions(self, agent_id: uuid.UUID) -> List[Commission]:
         result = await self.session.execute(
-            select(Commission).where(Commission.agent_id == agent_id)
+            select(Commission).where(Commission.agent_id == agent_id),
         )
         return list(result.scalars().all())
 
     async def get_referred_clients(self, agent_id: uuid.UUID) -> List[Client]:
         result = await self.session.execute(
-            select(Client).where(Client.referee_id == agent_id)
+            select(Client).where(Client.referee_id == agent_id),
         )
         return list(result.scalars().all())

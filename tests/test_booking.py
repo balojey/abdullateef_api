@@ -1,13 +1,13 @@
 import uuid
+
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from abdullateef_api.db.dao.booking_dao import BookingDAO
-from abdullateef_api.db.models.booking import Booking
-from abdullateef_api.db.models.client import Client
-from abdullateef_api.db.models.agent import Agent
-from abdullateef_api.db.models.hajj_package import HajjPackage
 from abdullateef_api.db.enums import BookingStatusEnum, CountryEnum
+from abdullateef_api.db.models.agent import Agent
+from abdullateef_api.db.models.client import Client
+from abdullateef_api.db.models.hajj_package import HajjPackage
 
 
 # ---------- Helper factories ----------
@@ -25,7 +25,7 @@ async def create_agent(session: AsyncSession, agent_code: str | None = None) -> 
 
 
 async def create_package(
-    session: AsyncSession, year: int = 2030, commission_amount: int = 1000
+    session: AsyncSession, year: int = 2030, commission_amount: int = 1000,
 ) -> HajjPackage:
     package = HajjPackage(
         id=uuid.uuid4(),
@@ -110,7 +110,7 @@ class TestBookingDAO:
         client = await create_client(dbsession)
 
         booking = await dao.create(
-            client_id=client.id, package_id=package.id, agent_id=agent.id
+            client_id=client.id, package_id=package.id, agent_id=agent.id,
         )
         await dbsession.commit()
 
@@ -155,7 +155,7 @@ class TestBookingDAO:
         agent2 = await create_agent(dbsession, agent_code="AG222")
 
         booking_a = await dao.create(
-            client_id=client.id, package_id=package.id, agent_id=agent1.id
+            client_id=client.id, package_id=package.id, agent_id=agent1.id,
         )
         booking_b = await dao.create(client_id=client.id, package_id=package.id)
         await dbsession.commit()
